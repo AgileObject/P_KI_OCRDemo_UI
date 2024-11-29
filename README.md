@@ -21,7 +21,7 @@ Ziel dieser Anwendung ist
 
 Kein Ziel war...
 1. Schöne Oberflächen zu bauen
-2. Perfeketen Clean Code zu erzeugen
+2. Perfekten Clean Code zu erzeugen
 3. Unit Testing bereit zu stellen
 4. Aktuellste Frameworks einzubinden und zu verwenden
 
