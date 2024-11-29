@@ -2,6 +2,8 @@
 
 ***Anmerkung:*** Ein Großteil dieser Dokumentation wurde mit GitHub CoPilot generiert.
 
+#   
+
 ## Ziel
 
 Ziel dieser Anwendung ist
@@ -16,6 +18,8 @@ Kein Ziel war...
 2. Perfeketen Clean Code zu erzeugen
 3. Unit Testing bereit zu stellen
 4. Aktuellste Frameworks einzubinden und zu verwenden
+
+#   
 
 ## Beschreibung
 
@@ -59,6 +63,8 @@ Hier ist eine kurze Übersicht der wichtigsten Methoden und deren Funktionen:
 
 Die Anwendung verwendet verschiedene Bibliotheken und Dienste, darunter Azure Computer Vision, AWS Textract und OpenAI GPT, um die OCR- und Textverarbeitungsfunktionen zu implementieren.
 
+#   
+
 ## Requirements
 
   > - Visual Studio 2022
@@ -67,9 +73,7 @@ Die Anwendung verwendet verschiedene Bibliotheken und Dienste, darunter Azure Co
   > - Zugriff auf AWS - AmazonTextractFullAccess
   > - Zugriff auf Microsoft Azure  
 
-
-
-
+#   
 
 ## Preparation
 
@@ -79,12 +83,16 @@ Die Anwendung verwendet verschiedene Bibliotheken und Dienste, darunter Azure Co
   > - OpenAI Key erforderlich
   ![image](https://github.com/user-attachments/assets/223cec22-d461-4b2d-b1dc-8b4b1a247b57)
 
+#   
+
 ### AWS
 
   > - AWS Zugriff (User Account - im IAM angelegter Benutzer mit entsprechenden Berechtigungen)
   ![image](https://github.com/user-attachments/assets/33cf9630-9fde-493c-9ab8-196dadb38792)
   > - Für den Zugriff auf AWS ist die Berechtigung auf AmazonTextract... erforderlich
   ![image](https://github.com/user-attachments/assets/6f19d372-b36a-4cb7-8b19-3466fd30cfc1)
+
+#   
 
 ### Azure
 
@@ -93,6 +101,8 @@ Die Anwendung verwendet verschiedene Bibliotheken und Dienste, darunter Azure Co
   ![image](https://github.com/user-attachments/assets/a47bf1ce-07df-45c3-b152-527a9a2ca371)
   > - Anlage einer Instanz für die Verwendung der Azure KI Vision
   ![image](https://github.com/user-attachments/assets/81f0b4ad-25db-4ff5-9cbb-907f38b2e9a5)
+
+#   
  
 ### Konfiguration
 
@@ -104,12 +114,17 @@ Die Anwendung verwendet verschiedene Bibliotheken und Dienste, darunter Azure Co
 
 ![image](https://github.com/user-attachments/assets/6a4def1c-943f-4f22-ae31-e121e9538563)
 
+#   
 
 ## Projektaufbau
 
 ![image](https://github.com/user-attachments/assets/b5ff0274-b748-47a8-888c-11fd390ec23d)
 
 Alle Funktionalitäten sind in Klassen für sich komplett gekapselt und wiederverwendbar.
+
+#    
+
+### Secrets
 
 Die Zugriffe der Anwendung sind in einer applicationsspezifischen Konfigurationsdatei hinterlegt. Alternativ können die Parameter für die Anwendung als Umgebungsvariablen gesetzt werden. Die Klassen lassen zudem eine Übergabe als Param zu.
 
@@ -162,16 +177,128 @@ Die Klasse AWSSecrets im Namensraum KI_OCRDemo_UI.AWS_Textract_Secrets dient daz
 
 Zusammengefasst, stellt die Klasse AWSSecrets sicher, dass die notwendigen AWS-Zugangsdaten aus verschiedenen Quellen geladen und validiert werden, bevor sie in der Anwendung verwendet werden.
 
+Die Zugriffsklassen für Azure und OpenAI funktionieren analog. Deshalb lasse ich die explizite Beschreibung hier weg...
+
+#   
+
+### OCR
 
 Die aktuell in diesem Projekt verwendeten OCR liegen hier: 
 
 ![image](https://github.com/user-attachments/assets/c6d0071d-a482-4d72-9aae-5d73317aac9b)
 
-*Hinweis:* Für beide OCR's wurde keine Optimierung vorgenommen. Ich bin mir sicher, dass in beiden Varianten mehr an Ergebnis möglich ist!
+***Anmerkung:*** Für beide OCR's wurde keine Optimierung vorgenommen. Ich bin mir sicher, dass in beiden Varianten mehr an Ergebnis möglich ist!
+
+#   
+
+#### AWS Textract
+
+Der Code definiert eine Klasse textractOCR im Namensraum KI_OCRDemo_UI.OCR, die die AWS Textract API verwendet, um OCR (Optical Character Recognition) auf einer gegebenen Bilddatei durchzuführen.
+
+![image](https://github.com/user-attachments/assets/423cdbf7-0d91-404d-924c-69451a7c5970)
+
+Hier sind die Hauptfunktionen der Klasse:
+
+1.	Deklarationen:
+   
+  > •	ILog _Logger: Ein Logger-Objekt für das Logging von Informationen und Fehlern.
+
+2.	GetOCRResultFromFile:
+
+  > •	Diese Methode nimmt den Dateinamen einer Bilddatei als Eingabe und führt OCR darauf durch.
+
+  > •	Es wird ein Zeitstempel generiert, um den Namen der Ergebnisdatei zu erstellen.
+
+  > •	Die Bilddatei wird gelesen und in einen MemoryStream geladen.
+
+  > •	Ein AmazonTextractClient wird mit den AWS-Zugangsdaten initialisiert.
+
+  > •	Ein AnalyzeDocumentRequest wird erstellt, um die Bilddatei zu analysieren. Es werden die Feature-Typen FORMS verwendet.
+
+  > •	Die Analyse wird asynchron durchgeführt, und die Antwort wird verarbeitet, um die Textblöcke zu extrahieren.
+
+  > •	Die Methode erstellt Key-Value-Mappings aus den extrahierten Blöcken und schreibt diese in die Ergebnisdatei.
+
+  > •	Die Methode gibt den Namen der Ergebnisdatei zurück.
+
+3.	Get_kv_relationship:
+
+  > •	Diese Methode nimmt Listen von Schlüssel- und Wertblöcken sowie eine Blockkarte und erstellt ein Dictionary, das die Schlüssel-Wert-Beziehungen enthält.
+
+  > •	Sie findet die entsprechenden Wertblöcke für jeden Schlüsselblock und extrahiert den Text aus beiden, um die Beziehungen zu erstellen.
+
+4.	Find_value_block:
+
+  > •	Diese Methode findet den entsprechenden Wertblock für einen gegebenen Schlüsselblock, indem sie die Beziehungen des Schlüsselblocks durchsucht.
+
+5.	Get_text:
+
+  > •	Diese Methode extrahiert den Text aus einem gegebenen Block und seinen untergeordneten Blöcken.
+
+  > •	Sie durchsucht die Beziehungen des Blocks und fügt den Text der untergeordneten Blöcke zusammen.
+
+Zusammengefasst, verwendet die Klasse textractOCR die AWS Textract API, um Text aus einer Bilddatei zu extrahieren und die extrahierten Schlüssel-Wert-Paare in einer Textdatei zu speichern.
+
+#   
+
+#### Azure KI Vision
+
+![image](https://github.com/user-attachments/assets/f15a6b06-2ae9-4b48-afb8-38afa2f30b20)
+
+Der Code definiert eine Klasse azureComputerVision im Namensraum KI_OCRDemo_UI.OCR, die die Azure Computer Vision API verwendet, um eine Bilddatei zu analysieren und die Ergebnisse in einer Textdatei zu speichern. Hier sind die Hauptfunktionen der Klasse:
+
+1.	Deklarationen:
+
+  > •	ILog _Logger: Ein Logger-Objekt für das Logging von Informationen und Fehlern.
+
+2.	ImageAnalysisSample_Analyze_File:
+
+  > •	Diese Methode nimmt den Dateinamen einer Bilddatei als Eingabe und führt eine Bildanalyse darauf durch.
+
+  > •	Es wird ein Zeitstempel generiert, um den Namen der Ergebnisdatei zu erstellen.
+
+  > •	Die Bilddatei wird gelesen und als VisionSource initialisiert.
+
+  > •	Ein VisionServiceOptions-Objekt wird mit den Azure-Zugangsdaten initialisiert.
+
+  > •	Ein ImageAnalysisOptions-Objekt wird erstellt, um die gewünschten Analyse-Features festzulegen (z.B. Objekte, Personen, Text, Tags).
+
+  > •	Ein ImageAnalyzer wird mit den Service- und Bildquellenoptionen initialisiert.
+
+  > •	Die Analyse wird synchron durchgeführt, und die Antwort wird verarbeitet, um die Ergebnisse zu extrahieren.
+
+  > •	Die Ergebnisse der Analyse (z.B. Bildhöhe, Bildbreite, erkannte Objekte, Text) werden in eine Textdatei geschrieben.
+
+  > •	Zusätzlich wird eine separate Textdatei erstellt, die nur die OCR-Textresultate enthält.
+
+  > •	Die Methode gibt den Namen der Datei mit den OCR-Textresultaten zurück.
+
+3.	Ergebnisverarbeitung:
+
+  > •	Die Methode verarbeitet verschiedene Analyseergebnisse wie Bildgröße, erkannte Objekte, Personen, Tags und Text.
+
+  > •	Die Ergebnisse werden in eine Textdatei geschrieben.
+
+  > •	Die JSON-Antwort der Analyse wird ebenfalls verarbeitet, um nur die Textresultate zu extrahieren und in eine separate Datei zu schreiben.
+
+4.	Fehlerbehandlung:
+  
+  > •	Wenn die Analyse fehlschlägt, werden die Fehlerdetails in die Ergebnisdatei geschrieben.
+
+  > •	Die Methode gibt eine Fehlermeldung zurück, wenn ein Fehler auftritt.
+
+Zusammengefasst, verwendet die Klasse azureComputerVision die Azure Computer Vision API, um eine Bilddatei zu analysieren und die Ergebnisse in Textdateien zu speichern. Die Methode ImageAnalysisSample_Analyze_File führt die Analyse durch, verarbeitet die Ergebnisse und speichert sie in Dateien.
+
+#   
+
+### ChatGPT
 
 Die Anbindung von ***ChatGPT*** erfolgt hier:
 
 ![image](https://github.com/user-attachments/assets/16f55141-c1ee-40f3-9bbe-70fe4aba815a)
+
+![image](https://github.com/user-attachments/assets/4ecfd214-9d9c-43d7-aa35-948d3e8ef48b)
+
 
 Dieser Code definiert eine Klasse ChatGptService innerhalb des Namensraums KI_OCRDemo_UI.OpenAI. Diese Klasse bietet zwei Hauptfunktionen, die mit dem OpenAI GPT-4 Modell interagieren: Textkorrektur und Bildanalyse. Hier ist eine detaillierte Beschreibung der Funktionen:
 
@@ -211,19 +338,20 @@ Hier ist eine kurze Übersicht der wichtigsten Methoden und deren Funktionen:
 
 Beide Methoden verwenden HttpClient, um HTTP-POST-Anfragen an die OpenAI API zu senden, und verarbeiten die JSON-Antworten, um die gewünschten Informationen zu extrahieren.
 
-
+#   
 
 ## UI
 
-Die Oberfläche besteht aus 5 Buttons, 2 Checkboxen und drei Anzeigefenstern... 
+Die Oberfläche besteht aus 5 Buttons, 2 Checkboxen, drei Anzeigefenstern und einem Eingabeprompt... 
 
-![image](https://github.com/user-attachments/assets/71d0625c-ff4c-487b-a034-78bfc212d541)
+![image](https://github.com/user-attachments/assets/1312d66f-7736-49a8-b5ad-4e843bf274e1)
+
 
 ### Select File
 
-![image](https://github.com/user-attachments/assets/373df3cb-a2e2-478a-adb4-b86bd2ade33d)
+![image](https://github.com/user-attachments/assets/ea3c5b3b-7621-42b0-8620-4f7ce6af936e)
 
-![image](https://github.com/user-attachments/assets/cc77ae4e-2ec4-4c19-96ed-f15d006b33b0)
+![image](https://github.com/user-attachments/assets/2fe0cd58-12c7-469c-b9f8-18776c980ca3)
 
 ## do OCR
 
@@ -232,17 +360,39 @@ kann man die jeweilig einzusetzende OCR auswählen...
 
 Der Button "do OCR" erzeugt dann mit Hilfe der ausgewählten OCR ein Ergebnis...
 
-![image](https://github.com/user-attachments/assets/befa8c99-adad-4ab3-94d7-9f99f03f6291)
+![image](https://github.com/user-attachments/assets/a77cc588-0273-4bcc-b174-e5d7d0f558c5)
 
 ## optimize with ChatGPT
 
 Das OCR Ergebnis kann direkt in ChatGPT optimiert werden.
 
-![image](https://github.com/user-attachments/assets/1bcec65e-b4b9-466d-8d90-fd9da1cf5fef)
+![image](https://github.com/user-attachments/assets/c1bfe3e0-fed8-4ffd-af8f-0f819cc44b44)
+
+![image](https://github.com/user-attachments/assets/28cca15b-e2f9-44a9-a22b-af89a758e9f4)
+
+## direct reading with ChatGPT
 
 Es gibt auch die Variante, keine OCR zu verwenden und das Bild direkt von ChatGPT erkennen zu lassen.
 
-![image](https://github.com/user-attachments/assets/f9bdfe80-7606-4f9a-9b6a-3e91b0a480c4)
+![image](https://github.com/user-attachments/assets/b8676b8c-a3c7-4846-87ef-1503e14f0679)
+
+![image](https://github.com/user-attachments/assets/4618fe72-3a91-47e5-98dc-d17362e519e0)
+
+Aber! Nicht alle Informationen sind lesbar! Gerade Handschriften stellen hier ein Problem da!
+
+![image](https://github.com/user-attachments/assets/09a3bd7a-9da3-4bb6-a083-612a07acc41a)
+
+Nutzung des GPT Promps
+
+![image](https://github.com/user-attachments/assets/084303f0-7242-4cd4-9d68-eee2f757b292)
+
+![image](https://github.com/user-attachments/assets/c9b09726-b7ef-4c30-a714-bd8555a2e12f)
+
+![image](https://github.com/user-attachments/assets/14047c89-9fd6-48f1-bb92-7df2e5545284)
+
+![image](https://github.com/user-attachments/assets/3c93e549-b18b-41be-82e5-36590faf54d0)
+
+
 
 
 
