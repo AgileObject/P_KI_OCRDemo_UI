@@ -1,12 +1,21 @@
 # KI_OCRDemo_UI - KODO
 
+***Anmerkung:*** Ein Großteil dieser Dokumentation wurde mit GitHub CoPilot generiert.
+
 ## Ziel
 
 Ziel dieser Anwendung ist
 1. Das Zeigen von Ergebnissen verschiedener OCR's aus Azure und AWS
 2. Das Zeigen von durch OpenAI (ChatGPT) verbesserten OCR-Ergebnissen
 3. Das Zeigen von OCR-Ergebnissen, die direkt aus ChatGPT (gpt-4o) generiert wurden.
-4. Grundsätzlich: Eine Vergleichbarkeit herstellen...
+4. Ein Gefühl für die Performance der Aufrufe zu vermitteln
+5. Grundsätzlich: Eine Vergleichbarkeit herstellen...
+
+Kein Ziel war...
+1. Schöne Oberflächen zu bauen
+2. Perfeketen Clean Code zu erzeugen
+3. Unit Testing bereit zu stellen
+4. Aktuellste Frameworks einzubinden und zu verwenden
 
 ## Beschreibung
 
@@ -50,6 +59,50 @@ Hier ist eine kurze Übersicht der wichtigsten Methoden und deren Funktionen:
 
 Die Anwendung verwendet verschiedene Bibliotheken und Dienste, darunter Azure Computer Vision, AWS Textract und OpenAI GPT, um die OCR- und Textverarbeitungsfunktionen zu implementieren.
 
+## Requirements
+
+  > - Visual Studio 2022
+  > - .NET 8.0
+  > - Zugriff auf die OpenAI API (User API-Key erforderlich)
+  > - Zugriff auf AWS - AmazonTextractFullAccess
+  > - Zugriff auf Microsoft Azure  
+
+
+
+
+
+## Preparation
+
+### OpenAI
+
+  > - User Account erforderlich
+  > - OpenAI Key erforderlich
+  ![image](https://github.com/user-attachments/assets/223cec22-d461-4b2d-b1dc-8b4b1a247b57)
+
+### AWS
+
+  > - AWS Zugriff (User Account - im IAM angelegter Benutzer mit entsprechenden Berechtigungen)
+  ![image](https://github.com/user-attachments/assets/33cf9630-9fde-493c-9ab8-196dadb38792)
+  > - Für den Zugriff auf AWS ist die Berechtigung auf AmazonTextract... erforderlich
+  ![image](https://github.com/user-attachments/assets/6f19d372-b36a-4cb7-8b19-3466fd30cfc1)
+
+### Azure
+
+  > - Azure Zugriff (User Account mit entsprechenden Berechtigungen)
+  > - Anlage einer Ressourcengruppe
+  ![image](https://github.com/user-attachments/assets/a47bf1ce-07df-45c3-b152-527a9a2ca371)
+  > - Anlage einer Instanz für die Verwendung der Azure KI Vision
+  ![image](https://github.com/user-attachments/assets/81f0b4ad-25db-4ff5-9cbb-907f38b2e9a5)
+ 
+### Konfiguration
+
+***Konfiguration der oben beschriebenen Schlüssel und Endpunkte in der app.config***
+
+![image](https://github.com/user-attachments/assets/b39c070e-edac-4bdc-84cc-e7efc970e135)
+
+***log4net.config***
+
+![image](https://github.com/user-attachments/assets/6a4def1c-943f-4f22-ae31-e121e9538563)
 
 
 ## Projektaufbau
@@ -60,10 +113,55 @@ Alle Funktionalitäten sind in Klassen für sich komplett gekapselt und wiederve
 
 Die Zugriffe der Anwendung sind in einer applicationsspezifischen Konfigurationsdatei hinterlegt. Alternativ können die Parameter für die Anwendung als Umgebungsvariablen gesetzt werden. Die Klassen lassen zudem eine Übergabe als Param zu.
 
-![image](https://github.com/user-attachments/assets/89053a7a-d916-44f2-9035-791ce32dafbe)
+![image](https://github.com/user-attachments/assets/9dce5f75-7992-436c-86c0-20f2d73f2203)
 
+Exemplarisch wird hier die Zugriffsklasse ***AWSSecrets.cs*** beschrieben...
 
-![image](https://github.com/user-attachments/assets/4ce048d1-4f97-4400-bc7b-4281991afbdc)
+![image](https://github.com/user-attachments/assets/99d28c0d-8262-41fa-953b-8cd0aa3407ee)
+
+Die Klasse AWSSecrets im Namensraum KI_OCRDemo_UI.AWS_Textract_Secrets dient dazu, die AWS-Zugangsdaten (Access Key ID und Secret Access Key) zu laden und zu verwalten. Diese Zugangsdaten werden benötigt, um auf AWS-Dienste wie Textract zuzugreifen. Hier sind die Hauptfunktionen der Klasse:
+
+1.	Deklarationen:
+
+  > •	ILog _Logger: Ein Logger-Objekt für das Logging von Informationen und Fehlern.
+
+  > •	EnvironmentVariableKey und EnvironmentVariableEndpoint: Namen der Umgebungsvariablen, die die AWS-Zugangsdaten enthalten können.
+
+  > •	AccessKeyId und SecretAccessKey: Statische Eigenschaften, die die geladenen AWS-Zugangsdaten speichern.
+
+2.	LoadSucceeded:
+   
+  > •	Diese Methode versucht, die AWS-Zugangsdaten zu laden, indem sie nacheinander verschiedene Quellen überprüft: Kommandozeilenargumente, Umgebungsvariablen und die App-Konfigurationsdatei.
+
+  > •	Wenn das Laden erfolgreich ist, werden die letzten Zeichen der Zugangsdaten maskiert und geloggt.
+
+  > •	Die Methode gibt true zurück, wenn beide Zugangsdaten erfolgreich geladen wurden, andernfalls false.
+
+3.	LoadKeySucceeded:
+
+  > •	Diese Methode versucht, die Access Key ID zu laden.
+
+  > •	Sie überprüft zuerst die Kommandozeilenargumente, dann die Umgebungsvariablen und schließlich die App-Konfigurationsdatei.
+
+  > •	Die Methode gibt true zurück, wenn die Access Key ID erfolgreich geladen wurde, andernfalls false.
+4.	LoadEndpointSucceeded:
+
+  > •	Diese Methode versucht, den Secret Access Key zu laden.
+
+  > •	Sie überprüft zuerst die Kommandozeilenargumente, dann die Umgebungsvariablen und schließlich die App-Konfigurationsdatei.
+
+  > •	Die Methode gibt true zurück, wenn der Secret Access Key erfolgreich geladen wurde, andernfalls false.
+
+5.	IsValidKey:
+
+  > •	Diese Methode überprüft, ob ein gegebener Schlüssel (key) das richtige Format hat.
+
+  > •	Ein gültiger Schlüssel muss ein 32-stelliges Hexadezimal-Zeichen sein.
+
+  > •	Die Methode gibt true zurück, wenn der Schlüssel gültig ist, andernfalls false.
+
+Zusammengefasst, stellt die Klasse AWSSecrets sicher, dass die notwendigen AWS-Zugangsdaten aus verschiedenen Quellen geladen und validiert werden, bevor sie in der Anwendung verwendet werden.
+
 
 Die aktuell in diesem Projekt verwendeten OCR liegen hier: 
 
