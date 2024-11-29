@@ -1,3 +1,9 @@
+# Inhalt der Projektmappe
+
+> - CreateSearchablePDF2: [Description](https://github.com/AgileObject/P_KI_OCRDemo_UI/blob/master/CreateSearchablePDF2/README.md)
+> - KI_OCRDemo_UI
+
+
 # KI_OCRDemo_UI - KODO
 
 ***Anmerkung:*** Ein Großteil dieser Dokumentation wurde mit GitHub CoPilot generiert.
