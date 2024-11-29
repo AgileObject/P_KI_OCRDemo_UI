@@ -124,7 +124,7 @@ Die Anwendung verwendet verschiedene Bibliotheken und Dienste, darunter Azure Co
 
 ## Projektaufbau
 
-![image](https://github.com/user-attachments/assets/b5ff0274-b748-47a8-888c-11fd390ec23d)
+![image](https://github.com/user-attachments/assets/4a0c2809-4735-4835-aaa2-ab51d60c67eb)
 
 Alle Funktionalitäten sind in Klassen für sich komplett gekapselt und wiederverwendbar.
 
